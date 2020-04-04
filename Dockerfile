@@ -30,3 +30,17 @@ COPY ./xdebug/ini.conf /home/configs/xdebug.ini
 RUN cat /home/configs/xdebug.ini >> /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN pecl install xdebug \
+
+# Install opcache extension for PHP accelerator
+RUN docker-php-ext-install opcache \
+    && docker-php-ext-enable opcache \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get autoremove -y
+	
+RUN echo 'date.timezone = "UTC"' >> /usr/local/etc/php/php.ini
+RUN echo 'opcache.max_accelerated_files = 20000' >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+RUN apt-get install -y libicu-dev \
+&& docker-php-ext-configure intl \
+&& docker-php-ext-install intl	
+
